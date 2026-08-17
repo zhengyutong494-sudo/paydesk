@@ -1,1 +1,189 @@
 
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="收单台">
+<meta name="theme-color" content="#0f172a">
+<title>PayDesk · 外贸收单工作台</title>
+<style>
+:root{--bg:#0f172a;--p:#1c2536;--p2:#27324a;--l:#33415c;--t:#e8edf5;--m:#94a3b8;--b:#3b82f6;--b2:#2563eb;--g:#22c55e;--r:#f87171;--a:#fbbf24;--pu:#a855f7;--c:#22d3ee}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"PingFang SC",system-ui,sans-serif;background:var(--bg);color:var(--t);overscroll-behavior:none}
+#app{display:flex;flex-direction:column;height:100dvh}
+header{position:sticky;top:0;z-index:10;padding-top:env(safe-area-inset-top);background:rgba(15,23,42,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--l)}
+.hd{display:flex;align-items:center;gap:10px;padding:12px 16px}
+.hd .lg{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--b),var(--pu));display:flex;align-items:center;justify-content:center;font-size:16px}
+.hd h1{font-size:17px;font-weight:700}
+main{flex:1;overflow-y:auto;padding:14px 14px 90px}
+.page{display:none;animation:fade .25s} .page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h3{font-size:14.5px;margin-bottom:8px}
+.card .d{color:var(--m);font-size:12px;margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:12px}
+.kpi .L{color:var(--m);font-size:11px}.kpi .V{font-size:20px;font-weight:700;margin-top:3px}
+.bar{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:12.5px}
+.bar .n{width:80px;color:var(--m);flex-shrink:0}.bar .tr{flex:1;height:8px;background:var(--p2);border-radius:6px;overflow:hidden}
+.bar .f{height:100%;background:linear-gradient(90deg,var(--b),var(--c));border-radius:6px}.bar .v{width:52px;text-align:right}
+.chip{display:inline-block;font-size:11px;padding:4px 9px;border-radius:20px;margin:3px 4px 0 0;background:rgba(59,130,246,.13);border:1px solid rgba(59,130,246,.35);color:#bcd4ff}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--l);font-size:13px}
+.row:last-child{border-bottom:0}.row .k{color:var(--m)}.row .vv{font-weight:600;text-align:right}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700}
+.tg{background:rgba(34,197,94,.18);color:#86efac}.trr{background:rgba(248,113,113,.18);color:#fca5a5}.ta{background:rgba(251,191,36,.18);color:#fde68a}.tc{background:rgba(34,211,238,.16);color:#a5f3fc}
+.btn{width:100%;background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;border:0;border-radius:12px;padding:13px;font-size:14.5px;font-weight:600}
+.btn.sec{background:var(--p2);border:1px solid var(--l);color:var(--t)}
+.f{margin-bottom:11px}.f label{display:block;font-size:12px;color:var(--m);margin-bottom:5px}
+.f input,.f select{width:100%;background:var(--p2);border:1px solid var(--l);border-radius:10px;padding:11px;color:var(--t);font-size:14px}
+.tg2{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--l)}
+.sw{width:42px;height:25px;border-radius:20px;background:var(--p2);border:1px solid var(--l);position:relative;transition:.2s}
+.sw.on{background:var(--b)}.sw::after{content:"";position:absolute;width:19px;height:19px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.2s}.sw.on::after{left:19px}
+.fee{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-bottom:1px dashed var(--l)}
+.fee:last-child{border-bottom:0}.fee .mn{color:var(--r)}.fee .net{color:var(--g);font-weight:700;font-size:15px}
+.al{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);border-radius:10px;padding:10px 12px;font-size:12.5px;color:#fca5a5;margin-bottom:8px}
+.al b{color:#fff}
+.mono{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--c);word-break:break-all}
+.hidden{display:none!important}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;background:rgba(15,23,42,.92);backdrop-filter:blur(18px);border-top:1px solid var(--l);padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0 7px;color:var(--m);font-size:10px;cursor:pointer}
+.tab .ti{font-size:20px}.tab.on{color:var(--b)}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="hd"><div class="lg">💳</div><h1 id="title">PayDesk</h1>
+<div style="margin-left:auto;display:flex;gap:14px;font-size:18px;color:var(--m)"><span>🔔</span><span>⚙️</span></div></div></header>
+<main id="main">
+<section class="page on" id="p_dash">
+  <div class="kpis">
+    <div class="kpi"><div class="L">今日 GMV</div><div class="V">$1.28M</div></div>
+    <div class="kpi"><div class="L">支付成功率</div><div class="V">92.7%</div></div>
+    <div class="kpi"><div class="L">拒付率</div><div class="V">0.42%</div></div>
+    <div class="kpi"><div class="L">退款率</div><div class="V">3.1%</div></div>
+  </div>
+  <div class="card"><h3>🌍 不同国家交易额</h3>
+    <div class="bar"><span class="n">美国</span><div class="tr"><div class="f" style="width:88%"></div></div><span class="v">$564K</span></div>
+    <div class="bar"><span class="n">英国</span><div class="tr"><div class="f" style="width:62%"></div></div><span class="v">$398K</span></div>
+    <div class="bar"><span class="n">德国</span><div class="tr"><div class="f" style="width:41%"></div></div><span class="v">$262K</span></div>
+  </div>
+  <div class="card"><h3>💠 卡组织 / 通道成功率</h3>
+    <div class="bar"><span class="n">Visa</span><div class="tr"><div class="f" style="width:94%"></div></div><span class="v">94%</span></div>
+    <div class="bar"><span class="n">Master</span><div class="tr"><div class="f" style="width:91%"></div></div><span class="v">91%</span></div>
+    <div class="bar"><span class="n">PSP B</span><div class="tr"><div class="f" style="width:96%"></div></div><span class="v">96%</span></div>
+  </div>
+  <div class="card"><h3>⚠️ 今日异常交易</h3>
+    <div class="row"><span class="k">TXN-90421 异常IP</span><span class="vv"><span class="tag ta">待审核</span></span></div>
+    <div class="row"><span class="k">TXN-90418 同设备多账户</span><span class="vv"><span class="tag trr">已拦截</span></span></div>
+  </div>
+</section>
+<section class="page" id="p_pay">
+  <div class="card"><h3>💳 支付方式</h3><span class="chip">信用卡</span><span class="chip">借记卡</span><span class="chip">Apple Pay</span><span class="chip">Google Pay</span><span class="chip">本地支付</span></div>
+  <div class="card"><h3>➕ 创建收款</h3>
+    <div class="f"><label>金额</label><input id="amt" type="number" value="1000"></div>
+    <div class="f"><label>币种</label><select id="cur"><option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>CNY</option></select></div>
+    <div class="f"><label>付款方式</label><select><option>Payment Link</option><option>Checkout</option><option>Invoice</option><option>API</option></select></div>
+    <div class="f"><label>指定客户</label><input placeholder="customer@email.com"></div>
+    <div class="f"><label>付款有效期</label><input type="date"></div>
+    <div class="tg2"><span>自动发送邮件</span><div class="sw on" data-t></div></div>
+    <div class="tg2"><span>自动生成 Invoice</span><div class="sw" data-t></div></div>
+    <button class="btn" onclick="mk()">生成收款链接</button>
+  </div>
+  <div class="card" id="lb" style="display:none"><h3>🔗 已生成 Payment Link</h3><div class="mono" id="lu"></div><button class="btn sec" style="margin-top:8px" onclick="cp()">复制链接</button></div>
+  <div class="card"><h3>🪄 嵌入真实 Stripe 付款框</h3><div class="d">粘贴你的 Stripe Payment Link，付款框直接显示，卡号在 Stripe 端收。</div>
+    <div class="f"><label>Stripe Payment Link</label><input id="sl" placeholder="https://buy.stripe.com/test_xxx"></div>
+    <button class="btn" onclick="emb()">嵌入付款框</button>
+    <div id="sb" class="hidden" style="margin-top:10px"><iframe id="sf" style="width:100%;height:540px;border:0;border-radius:12px;background:#fff" allowpaymentrequest allow="payment"></iframe></div>
+  </div>
+  <div class="card"><h3>🧾 最近交易</h3>
+    <div class="row" style="cursor:pointer" onclick="oT('TXN-90421')"><span class="k">TXN-90421<br><span style="font-size:11px">Globex · Master</span></span><span class="vv">$860 USD<br><span class="tag ta">待审核</span></span></div>
+    <div class="row" style="cursor:pointer" onclick="oT('TXN-90418')"><span class="k">TXN-90418<br><span style="font-size:11px">ACME · Visa</span></span><span class="vv">$1250 USD<br><span class="tag trr">已拦截</span></span></div>
+  </div>
+</section>
+<section class="page" id="p_risk">
+  <div class="card"><h3>⚙️ 规则引擎 / 黑名单 / ML</h3>
+    <div class="tg2"><span>高频交易拦截</span><div class="sw on" data-t></div></div>
+    <div class="tg2"><span>AVS / CVV 校验</span><div class="sw on" data-t></div></div>
+    <div class="tg2"><span>黑名单命中</span><div class="sw on" data-t></div></div>
+    <div class="tg2"><span>ML 实时 Risk Score</span><div class="sw on" data-t></div></div>
+  </div>
+  <div class="card"><h3>📡 实时监控</h3>
+    <div class="row"><span class="k">异常 IP</span><span class="vv"><span class="tag ta">2 触发</span></span></div>
+    <div class="row"><span class="k">同设备多账户</span><span class="vv"><span class="tag trr">1 拦截</span></span></div>
+    <div class="row"><span class="k">Chargeback 风险</span><span class="vv"><span class="tag ta">预警</span></span></div>
+    <div class="row"><span class="k">其他 8 项</span><span class="vv"><span class="tag tc">监控中</span></span></div>
+  </div>
+  <div class="card"><h3>🔐 3DS 验证</h3>
+    <div class="kpis" style="gap:8px">
+      <div class="kpi"><div class="L">Attempts</div><div class="V">3,420</div></div>
+      <div class="kpi"><div class="L">Success</div><div class="V">3,118</div></div>
+      <div class="kpi"><div class="L">Challenge</div><div class="V">510</div></div>
+      <div class="kpi"><div class="L">Liability Shift</div><div class="V">91%</div></div>
+    </div>
+    <div class="al" style="margin-top:10px"><b>为何失败？</b> TXN-90418：Challenge 后验证未通过，未取得 Liability Shift。</div>
+  </div>
+</section>
+<section class="page" id="p_fund">
+  <div class="card"><h3>🧮 结算单 · 费用拆解</h3>
+    <div class="fee"><span>客户支付</span><span>$1,000.00</span></div>
+    <div class="fee"><span>Processing Fee</span><span class="mn">−$29</span></div>
+    <div class="fee"><span>Cross-border Fee</span><span class="mn">−$10</span></div>
+    <div class="fee"><span>FX Fee</span><span class="mn">−$8</span></div>
+    <div class="fee"><span>Reserve</span><span class="mn">−$20</span></div>
+    <div class="fee"><span class="net">商户实收 Net</span><span class="net">$933.00</span></div>
+  </div>
+  <div class="card"><h3>↩️ 退款</h3><div class="row"><span class="k">TXN-90112 部分</span><span class="vv">$120 运费争议</span></div></div>
+  <div class="card"><h3>⚔️ 拒付中心</h3><div class="row"><span class="k">TXN-89930 未授权</span><span class="vv"><span class="tag trr">举证中</span> 剩36h</span></div><button class="btn sec" style="margin-top:8px" onclick="ev()">🤖 AI 生成拒付证据包</button><div id="eb" class="hidden" style="margin-top:8px"></div></div>
+  <div class="card"><h3>🔍 对账中心</h3>
+    <div class="al"><b>⚠️ $2,350</b> 金额差异（PSP vs 内部）</div>
+    <div class="al"><b>⚠️ 3 笔</b> 未进入结算</div>
+    <div class="al"><b>⚠️ 1 笔</b> 退款未匹配</div>
+  </div>
+</section>
+<section class="page" id="p_mer">
+  <div class="card"><h3>🏢 商户入网 KYB</h3>
+    <div class="row"><span class="k">公司 / 注册</span><span class="vv"><span class="tag tg">已验证</span></span></div>
+    <div class="row"><span class="k">UBO 受益人</span><span class="vv"><span class="tag ta">待补充</span></span></div>
+    <div class="row"><span class="k">MCC / 模式</span><span class="vv">5411 零售</span></div>
+    <div class="row"><span class="k">交易国家</span><span class="vv">US/GB/DE/JP</span></div>
+    <div class="row"><span class="k">Risk Level</span><span class="vv"><span class="tag tg">Low</span></span></div>
+  </div>
+  <div class="card"><h3>🔑 开发者 API</h3>
+    <div class="f"><label>Publishable Key</label><div class="mono">pk_live_3F9x…aQ2</div></div>
+    <div class="f"><label>Secret Key</label><div class="mono">sk_live_8Kd…••••</div></div>
+    <div style="font-size:11px;color:var(--m)">POST Create/Capture/Refund Payment · GET Transaction/Settlement · Webhooks: payment.succeeded/refunded/chargeback.created</div>
+  </div>
+</section>
+<section class="page" id="p_ai">
+  <div class="card"><h3>🤖 AI 收单助手</h3><div class="d">直接用自然语言提问</div></div>
+  <div class="card"><div id="chat"><div class="row" style="border:0;color:var(--m);font-size:13px">你好，试试问："为什么今天支付成功率下降？"</div></div></div>
+  <div style="display:flex;gap:8px"><input id="q" placeholder="输入问题…" style="flex:1;background:var(--p2);border:1px solid var(--l);border-radius:12px;padding:12px;color:var(--t)"><button class="btn" style="width:auto;padding:12px 18px" onclick="ask()">发送</button></div>
+</section>
+</main>
+<nav class="bottom">
+  <div class="tab on" data-b="dash"><div class="ti">📊</div>仪表盘</div>
+  <div class="tab" data-b="pay"><div class="ti">💳</div>收款</div>
+  <div class="tab" data-b="risk"><div class="ti">🛡️</div>风控</div>
+  <div class="tab" data-b="fund"><div class="ti">💰</div>资金</div>
+  <div class="tab" data-b="mer"><div class="ti">🏢</div>商户</div>
+  <div class="tab" data-b="ai"><div class="ti">🤖</div>AI</div>
+</nav>
+</div>
+<script>
+const T={dash:"仪表盘",pay:"收款中心",risk:"风控中心",fund:"资金中心",mer:"商户中心",ai:"AI 收单助手"};
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{const id=t.dataset.b;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById('p_'+id).classList.add('on');document.getElementById('title').textContent=T[id];main.scrollTop=0;});
+document.querySelectorAll('[data-t]').forEach(s=>s.onclick=()=>s.classList.toggle('on'));
+function mk(){const a=amt.value,c=cur.value,u="https://paydesk.app/p/"+Math.random().toString(36).slice(2,9)+"?amt="+a+"&cur="+c;lu.textContent=u;lb.style.display='block';}
+function cp(){navigator.clipboard&&navigator.clipboard.writeText(lu.textContent);alert("已复制:\n"+lu.textContent);}
+function emb(){let l=sl.value.trim();if(!l){alert("先粘贴 Stripe Payment Link");return;}if(!/^https?:\/\//.test(l))l="https://"+l;sf.src=l;sb.classList.remove('hidden');sb.scrollIntoView({behavior:"smooth"});}
+function oT(id){alert("交易详情 "+id+"\nMerchant / Card Brand / 3DS / Risk Score / PSP / Auth Code 等字段见完整版");}
+function ev(){eb.classList.remove('hidden');eb.innerHTML='<div class="al" style="margin:0"><b>✅ AI 已生成拒付证据包</b><br>📦 Order INV-7731 · 💳 Payment TXN-89930 · 🚚 Tracking 已签收 · ✉️ 邮件确认</div>';}
+const KB={成功率:"今天美国成功率从 <b>96.2% 降至 89.4%</b>，主因 PSP A 的 Visa 失败率升，建议将美国 Visa 30% 切到 PSP B。",拒付:"拒付率 0.42%，低于阈值安全，但 2 笔待举证。",退款:"近 7 天退款率 3.1%，$18.6K，正常。",对账:"匹配率 99.4%，发现 $2,350 差异、3 笔未结算、1 笔退款未匹配。",费用:"$1000 −29 −10 −8 −20 = 实收 <b>$933</b>。"};
+function ask(){const q=document.getElementById('q').value.trim();if(!q)return;const ch=chat;ch.innerHTML+='<div class="row" style="border:0;justify-content:flex-end;color:var(--b)">'+q+'</div>';q.value='';let a="可分析成功率/拒付/退款/对账/3DS/费用，试试：为什么今天支付成功率下降？";for(const k in KB)if(q.indexOf(k)>=0){a=KB[k];break;}setTimeout(()=>{ch.innerHTML+='<div class="row" style="border:0;color:var(--t)">'+a+'</div>';main.scrollTop=main.scrollHeight;},400);}
+</script>
+</body>
+</html>
